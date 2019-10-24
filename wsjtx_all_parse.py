@@ -52,27 +52,36 @@ def doadifline( call , param ):
 	print adif
 	
 with open(fname, "r") as f:
+	currentdone=''
 	for line in f:
 		if not ' Transmitting ' in line:
 			oldline=line
 		if not ' ~' in line:
+			currentdone=''
 			if ' Rx' in line and DXCALL in line and 'RR73;' in line:
 				rxwords=line.split()
-				qso_list[rxwords[9] ] = rxwords[11]
-				if rxwords[7] in qso_list:
-					doadifline( rxwords[7], rxwords )
+				#if rxwords[8] in "RR73;" and rxwords[10] in DXCALL:
+				currentdone = rxwords[9]
+				qso_list[ rxwords[9] ] = rxwords[11]
+				
+				if currentdone in qso_list:
+					doadifline( currentdone, rxwords )
 					count+=1
 			elif ' Rx' in line and DXCALL in line and 'RR73' in line:
 				rxwords=line.split()
+				#print rxwords 
 				if rxwords[7] in qso_list:
 					doadifline( rxwords[7], rxwords )
 					count+=1
 			elif ' Rx' in line and DXCALL in line and not 'RR73' in line:
 				# only raport
 				rxraports=line.split()
-				#print rxraports
+				if rxraports[8]==DXCALL:
+					qso_list[rxwords[7] ] = rxwords[9]
+					#print rxraports
 			elif ' Tx' in line and DXCALL in line:
 				txwords=line.split()
 				#print txwords  
 print count
+
 f.close()
